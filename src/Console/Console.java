@@ -4,6 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+/**
+ * this class you can use to print things with color (colour)
+ * as you can see in the {@link main.Main} you type /-COLOR here-/ you can see the names in the {@link #getStringBackColorHashMap()}
+ * there you can see all the different colors you can use first it is the color. If you want you type _ and then one or two letters
+ * that makes it different like you can type /-BLACK-/ then you get a black color but if you want a black background you type /-BLACK_B-/.
+ * If you want a red text and a blue background you type /-RED BLUE_B-/ or /-BLUE_B RED-/ both give the same result.
+ * this class is {@code abstract} because you don't have to make a object of this
+ * when you print it does the {@link #init()} because it needs the {@link #COLOR_WITH_CODE}
+ * it does that one time when it {@link #COLOR_WITH_CODE} is {@code null} <br><br>
+ * @author warre wilms
+ * @see System
+ */
 public abstract class Console {
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -85,13 +97,21 @@ public abstract class Console {
     private static HashMap<String,String> COLOR_WITH_CODE;
 
 
+    /**
+     * it will only do {@link #getStringBackColorHashMap()} one time when {@link #COLOR_WITH_CODE} {@code null} is
+     */
     public static void init() {
         if (COLOR_WITH_CODE ==null) {
             COLOR_WITH_CODE =getStringStringHashMap();
         }
     }
 
-    private static String replaceWithColors(String input) {
+    /**
+     * this will replace the colors typed with the according strings for the colors
+     * @param input input {@code string} that needs to be transformed
+     * @return {@code string}
+     */
+    public static String replaceWithColors(String input) {
         class StringRememberment {
             private final int begin;
             private final String string;
@@ -104,19 +124,7 @@ public abstract class Console {
         init();
         String beginInput=input;
         ArrayList<StringRememberment> rememberments=new ArrayList<>();
-//        String[] strings=beginInput.split("\n");
-//        String last="";
-//        StringBuilder builder=new StringBuilder();
-//        for (int i = 0; i < strings.length; i++) {
-//            if (i!=0) {
-//                builder.append("\n");
-//            }
-//
-//            builder.append(last);
-//            last=getLastColor(strings[i]);
-//            builder.append(strings[i]);
-//        }
-//        input=builder.toString();
+
         int begin=-1;
         int end=-1;
         do {
@@ -125,16 +133,6 @@ public abstract class Console {
             end=input.indexOf("-/");
             if (end==-1) break;
 
-//            String string=input.substring(begin+2, end);
-//            String replaceWith=getStringColor(string);
-//            boolean containsAnny=false;
-//            String[] strings=string.split(" ");
-//
-//            if(!containsAnny){
-//                StringRememberment stringRememberment=new StringRememberment(begin, replaceWith);
-//                rememberments.add(stringRememberment);
-//                input=input.replace(replaceWith,"");
-//            }
             String string=input.substring(begin+2, end);
             String replaceWith=getStringColor(string);
             if (COLOR_WITH_CODE.containsKey(string)) {
@@ -160,26 +158,11 @@ public abstract class Console {
         }
         return input;
     }
-    private static String getLastColor(String input) {
-        int begin=-1;
-        int end=-1;
-        String last="";
-        do {
-            begin=input.indexOf("/-");
-            if (begin==-1) break;
-            end=input.indexOf("-/");
-            if (end==-1) break;
 
-            String string=input.substring(begin+2, end);
-            String replaceWith=getStringColor(string);
-            if (COLOR_WITH_CODE.containsKey(string)) {
-                last=replaceWith;
-            }
-            input=input.replace(replaceWith,"");
-        } while (true);
-        return last;
-    }
-
+    /**
+     * this will combine the backgrounds with the colors this {@link HashMap} will have a size of 1601 elements there is a better way to do this but it works
+     * @return {@link HashMap}
+     */
     private static HashMap<String, String> getStringStringHashMap() {
         HashMap<String, String> colorWithCode = getStringColorHashMap();
         HashMap<String, String> backColorWithCode = getStringBackColorHashMap();
@@ -188,7 +171,7 @@ public abstract class Console {
         Set<String> stringSet=colorWithCode.keySet();
         for (String color : stringSet) {
             for(String backColor : backColorWithCode.keySet()) {
-                String colorCode=colorWithCode.get(color) + " " +backColorWithCode.get(backColor);
+                String colorCode=colorWithCode.get(color) + backColorWithCode.get(backColor);
                 newColorWithCode.put(color+ " "+  backColor, colorCode);
                 newColorWithCode.put(backColor+ " "+  color, colorCode);
             }
@@ -282,8 +265,7 @@ public abstract class Console {
         return "/-"+input+"-/";
     }
     public static void println(String s) {
-        s=replaceWithColors(s);
-        System.out.println(s);
+        print(s+"\n");
     }
     public static void println() {
         println("");
